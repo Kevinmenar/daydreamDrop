@@ -6,6 +6,8 @@ public class Throwable : MonoBehaviour
     private Rigidbody _rigidbody;
     private Vector3 _currentGrabbedLocation; // The tracked location of our object for us to throw
     private bool _isGrabbed;
+	private bool _isInBall;
+	private float _speedSlowDown;
 
     private const string OutlineWidthKey = "_Outline";
     private const float OutlineWidthValue = 0.03f;
@@ -18,6 +20,8 @@ public class Throwable : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _currentGrabbedLocation = new Vector3();
         _isGrabbed = false;
+		_isInBall = false;
+		_speedSlowDown = 0.1f;
     }
 
     void Update()
@@ -26,6 +30,12 @@ public class Throwable : MonoBehaviour
         {
             _currentGrabbedLocation = transform.position;
         }
+
+		if (_isInBall && GvrControllerInput.IsTouching) {
+			Vector3 touchPos = GvrControllerInput.TouchPos;
+			Vector3 movementVector = new Vector3 (0, 0, touchPos.y - 0.5f);
+			transform.Translate (0, 0, -movementVector.z * _speedSlowDown);
+		}
     }
 
     // Shows the outline by setting the width to be a fixed avalue when we are 
@@ -33,6 +43,8 @@ public class Throwable : MonoBehaviour
     public void ShowOutlineMaterial()
     {
         _outlineMaterial.SetFloat(OutlineWidthKey, OutlineWidthValue);
+		_isInBall = true;
+
     }
 
     // Hides the outline by making the width 0 when we are no longer 
@@ -40,14 +52,19 @@ public class Throwable : MonoBehaviour
     public void HideOutlineMaterial()
     {
         _outlineMaterial.SetFloat(OutlineWidthKey, 0);
+		_isInBall = false;
     }
+
+	public void moveObjectZ(GameObject throwableObject) {
+		
+	}
 
     // Setup our throwable game object for when it is grabbed. Set the object that
     // grabbed it as its parent and disables kiniematics
     public void GetGrabbed(GameObject controllerObject)
     {
         transform.parent = controllerObject.transform; // Set object as a child so it'll follow our controller
-        _rigidbody.isKinematic = true; // Stops physics from affecting the grabbed object
+        //_rigidbody.isKinematic = true; // Stops physics from affecting the grabbed object
         _isGrabbed = true;
     }
 
@@ -58,7 +75,7 @@ public class Throwable : MonoBehaviour
         if (_isGrabbed)
         {
             transform.parent = null; // Un-parent throwable object so it doesn't follow the controller
-            _rigidbody.isKinematic = false; // Re-enables the physics engine.
+            //_rigidbody.isKinematic = false; // Re-enables the physics engine.
 
             Vector3 throwVector = transform.position - _currentGrabbedLocation;
             _rigidbody.AddForce(throwVector * 10, ForceMode.Impulse); // Throws the ball by applying the given force
