@@ -31,12 +31,9 @@ public class PlayerController : MonoBehaviour
     public void ReleaseGameObject()
     {
         // Only throw an object if we're holding onto something
-        if (_grabbedThrowable != null)
-        {
-			_isFloating = false;
-            _grabbedThrowable.GetReleased();
-            _grabbedThrowable = null;
-        }
+		_isFloating = false;
+        _grabbedThrowable.GetReleased();
+        _grabbedThrowable = null;
     }
 
 	public void holdReleaseController(GameObject throwableObject) {

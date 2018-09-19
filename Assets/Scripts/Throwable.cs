@@ -31,12 +31,14 @@ public class Throwable : MonoBehaviour
             _currentGrabbedLocation = transform.position;
         }
 
-		if (_isInBall && GvrControllerInput.IsTouching) {
+		if (_isGrabbed && GvrControllerInput.IsTouching) {
 			Vector3 touchPos = GvrControllerInput.TouchPos;
 			Vector3 movementVector = new Vector3 (0, 0, touchPos.y - 0.5f);
 			transform.Translate (0, 0, -(movementVector.z * _speedSlowDown));
 		}
     }
+
+
 
     // Shows the outline by setting the width to be a fixed avalue when we are 
     // pointing at it.
@@ -64,6 +66,9 @@ public class Throwable : MonoBehaviour
     public void GetGrabbed(GameObject controllerObject)
     {
         transform.parent = controllerObject.transform; // Set object as a child so it'll follow our controller
+		transform.localPosition = new Vector3(0, 0, 0);
+		transform.localEulerAngles = new Vector3(15, 0, 0);
+		transform.Translate (0, 0, 2.5f);
         _rigidbody.isKinematic = true; // Stops physics from affecting the grabbed object
         _isGrabbed = true;
     }
@@ -77,8 +82,6 @@ public class Throwable : MonoBehaviour
             transform.parent = null; // Un-parent throwable object so it doesn't follow the controller
             _rigidbody.isKinematic = false; // Re-enables the physics engine.
 
-            Vector3 throwVector = transform.position - _currentGrabbedLocation;
-            _rigidbody.AddForce(throwVector * 10, ForceMode.Impulse); // Throws the ball by applying the given force
             _isGrabbed = false;
         }
     }
