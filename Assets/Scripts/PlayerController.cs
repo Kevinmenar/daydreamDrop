@@ -4,11 +4,13 @@ public class PlayerController : MonoBehaviour
 {
     private Throwable _grabbedThrowable; // The object we're grabbing
     private Rigidbody _rigidbody;
+	private bool _isFloating;
 
 	void Start ()
 	{
 	    _grabbedThrowable = null;
 	    _rigidbody = GetComponent<Rigidbody>();
+		_isFloating = false;
 	}
 
     // Called by the Event System when we click on an object, receives a game object to hold.
@@ -18,6 +20,7 @@ public class PlayerController : MonoBehaviour
         Throwable throwable = throwableObject.GetComponent<Throwable>();
         if (throwable != null)
         {
+			_isFloating = true;
             _grabbedThrowable = throwable;
             _grabbedThrowable.GetGrabbed(gameObject);
         }
@@ -30,8 +33,17 @@ public class PlayerController : MonoBehaviour
         // Only throw an object if we're holding onto something
         if (_grabbedThrowable != null)
         {
+			_isFloating = false;
             _grabbedThrowable.GetReleased();
             _grabbedThrowable = null;
         }
     }
+
+	public void holdReleaseController(GameObject throwableObject) {
+		if (!_isFloating) {
+			HoldGameObject(throwableObject);
+		} else {
+			ReleaseGameObject ();
+		}
+	}
 }
